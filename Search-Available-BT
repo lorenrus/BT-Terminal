@@ -1,0 +1,208 @@
+package com.example.bt_terminal_1;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.os.Bundle;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import android.view.View;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.Set;
+
+public class Search_Available_BT extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    // Bottone di ricerca
+
+    Button Scan_Button;
+
+    // Cercherà i dispositivi disponibili
+
+    BluetoothAdapter myBluetoothAdapater;
+
+    // Lista contente i dispositivi rilevati
+
+    Set<BluetoothDevice> Device;
+
+    // Lista
+
+    ListView List_View;
+
+    // Array che serve per visulizzare i dispositivi nella lista
+
+    ArrayAdapter<String> Adapter = null;
+
+    // Codice di associazione
+
+    int RequestCodeForEnable = 1;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search__available__bt);
+
+
+        Scan_Button = (Button) findViewById(R.id.scan_BT);
+
+        myBluetoothAdapater = BluetoothAdapter.getDefaultAdapter();
+
+        List_View = (ListView) findViewById(R.id.available_list);
+
+        Adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
+
+        List_View.setAdapter(Adapter);
+
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    public void Carica_Dispositivi(){
+
+        Device = BT_Adapter.getBondedDevices();
+
+        Adapter.clear();
+
+        for(BluetoothDevice bt: Device)
+        {
+            Adapter.add(bt.getName());
+        }
+    }
+
+    private void Scansiona(){
+
+        Scan_Button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+
+            public void onClick(View v) {
+
+                if(!BT_Adapter.isEnabled())
+                {
+                    Intent Richiesta_Attivazione = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                    startActivityForResult(Richiesta_Attivazione,RequestCodeForEnable);
+                }
+                //else
+                //{
+                //   Carica_Dispositivi();
+                //}
+
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RequestCodeForEnable)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                Toast.makeText(getApplicationContext(),"Bluetooth is ENABLE",Toast.LENGTH_LONG).show();
+            }
+            else if(resultCode == RESULT_CANCELED)
+            {
+                Toast.makeText(getApplicationContext(),"Bluetooth Enabling Cancelled",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.search__available__bt, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+}
